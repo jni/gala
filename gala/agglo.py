@@ -433,7 +433,8 @@ class Rag(Graph):
 
         See Also
         --------
-        ``real_edges_iter``, ``networkx.Graph.edges``.
+        See :func:``~gala.Rag.real_edges_iter``,
+        and :func:``~networkx.Graph.edges``.
         """
         return [e for e in super(Rag, self).edges(*args, **kwargs) if
                                             self.boundary_body not in e[:2]]
@@ -634,7 +635,7 @@ class Rag(Graph):
 
         See Also
         --------
-        ``self.set_watershed``
+        See :func:``~gala.agglo.Rag.set_watershed``
         """
         return self.pixel_neighbors[idxs]
 
@@ -900,7 +901,7 @@ class Rag(Graph):
 
         See Also
         --------
-        ``self.build_merge_queue``
+        See :func:``~gala.agglo.Rag.build_merge_queue``
         """
         self.merge_queue = self.build_merge_queue()
 
@@ -981,7 +982,7 @@ class Rag(Graph):
 
         See Also
         --------
-        ``Rag.agglomerate``.
+        See :func:``~gala.agglo.Rag.agglomerate``.
         """
         if self.merge_queue.is_empty():
             self.merge_queue = self.build_merge_queue()
@@ -1142,7 +1143,7 @@ class Rag(Graph):
 
         See Also
         --------
-        ``Rag.__init__``
+        See :func:``~gala.agglo.Rag.__init__``
         """
         learning_mode = learning_mode.lower()
         labeling_mode = labeling_mode.lower()
@@ -1226,7 +1227,7 @@ class Rag(Graph):
 
         See Also
         --------
-        ``learn_agglomerate``.
+        See :func:``~gala.agglo.Rag.learn_agglomerate``.
         """
         if type(gts) != list:
             gts = [gts] # allow using single ground truth as input
@@ -1660,7 +1661,7 @@ class Rag(Graph):
 
         See Also
         --------
-        ``agglo.Rag.get_ucm``
+        See :func:``~gala.agglo.Rag.get_ucm``
         """
         return morpho.juicy_center(self.segmentation, self.pad_thickness)
 
