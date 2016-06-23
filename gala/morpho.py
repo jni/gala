@@ -508,6 +508,8 @@ def pad(ar, vals, axes=None):
         return pad(ar2, vals[1:], axes)
         
 def juicy_center(ar, skinsize=1):
+    if skinsize == 0:
+        return ar
     for i in range(ar.ndim):
         ar = ar.swapaxes(0,i)
         ar = ar[skinsize:-skinsize]
