@@ -88,7 +88,7 @@ def bench_suite():
     memory = OrderedDict()
     wstr, prtr, gttr = trdata()
     with timer() as t_build_rag:
-        g = agglo.Rag(wstr, prtr)
+        g = agglo.Rag(wstr, prtr, fast_graph=True)
     times['build RAG'] = t_build_rag[0]
     memory['base RAG'] = asizeof(g)
     with timer() as t_features:
@@ -112,7 +112,7 @@ def bench_suite():
     policy = agglo.classifier_probability(em, cl)
     wsts, prts, gtts = tsdata()
     gtest = agglo.Rag(wsts, prts, merge_priority_function=policy,
-                      feature_manager=em)
+                      feature_manager=em, fast_graph=True)
     with timer() as t_segment:
         gtest.agglomerate(np.inf)
     times['segment test volume'] = t_segment[0]
