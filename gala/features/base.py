@@ -5,6 +5,7 @@ from .. import evaluate as ev
 class Null(object):
     def __init__(self, *args, **kwargs):
         self.default_cache = 'feature-cache'
+        self.size = 0
 
     def __call__(self, g, n1, n2=None):
         return self.compute_features(g, n1, n2)
@@ -46,6 +47,10 @@ class Composite(Null):
     def __init__(self, children=[], *args, **kwargs):
         super(Composite, self).__init__()
         self.children = children
+
+    @property
+    def size(self):
+        return sum(c.size for c in self.children)
  
     def write_fm(self, json_fm={}):
         for child in self.children:
@@ -122,6 +127,7 @@ class Mock(Null):
         self.ctable = ev.contingency_table(frag, gt, ignore_seg=[],
                                            ignore_gt=[]).toarray()
         self._std = 0.1  # standard deviation of feature computations
+        self.size = 2
 
     def eps(self):
         return np.random.randn(2) * self._std
