@@ -13,11 +13,10 @@ from . import \
     graph, \
     histogram, \
     inclusion, \
-    io, \
     moments, \
     orientation, \
     squiggliness
 
 __all__ = ['base', 'contact', 'convex_hull', 'default',
            'graph', 'histogram', 'inclusion',
-           'io', 'moments', 'orientation', 'squiggliness']
+           'moments', 'orientation', 'squiggliness']
