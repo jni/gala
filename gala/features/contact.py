@@ -71,7 +71,8 @@ class Manager(base.Null):
             ar = g.oriented_probabilities_r
         else:
             ar = g.non_oriented_probabilities_r
-        totals = np.empty(ar.shape[:2] + (3,), dtype='double')
+        totals = np.ones((ar.shape[1], len(self.thresholds), 3),
+                         dtype='double')
         _compute_edge_cache(edge_idxs, n1_idxs, n2_idxs,
                             ar, self.thresholds, totals=totals)
         return totals

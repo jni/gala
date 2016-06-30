@@ -135,7 +135,7 @@ class Mock(Null):
         self.ctable = ev.contingency_table(frag, gt, ignore_seg=[],
                                            ignore_gt=[]).toarray()
         self._std = 0.1  # standard deviation of feature computations
-        self._size = 2
+        self.size = 2
 
     def eps(self):
         return np.random.randn(2) * self._std
