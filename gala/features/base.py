@@ -36,9 +36,9 @@ class Null(object):
             self.compute_difference_features(g, n1, n2, c1, c2)
         ))
     def create_node_cache(self, *args, **kwargs):
-        return np.array([])
+        return None
     def create_edge_cache(self, *args, **kwargs):
-        return np.array([])
+        return None
     def update_node_cache(self, *args, **kwargs):
         pass
     def update_edge_cache(self, *args, **kwargs):
