@@ -5,7 +5,11 @@ from .. import evaluate as ev
 class Null(object):
     def __init__(self, *args, **kwargs):
         self.default_cache = 'feature-cache'
-        self.size = 0
+        self._size = 0
+
+    @property
+    def size(self):
+        return self._size
 
     def __call__(self, g, n1, n2=None):
         return self.compute_features(g, n1, n2)
