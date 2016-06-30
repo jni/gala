@@ -11,6 +11,10 @@ class Null(object):
     def size(self):
         return self._size
 
+    @size.setter
+    def size(self, num : int):
+        self._size = num
+
     def __call__(self, g, n1, n2=None):
         return self.compute_features(g, n1, n2)
 
@@ -131,7 +135,7 @@ class Mock(Null):
         self.ctable = ev.contingency_table(frag, gt, ignore_seg=[],
                                            ignore_gt=[]).toarray()
         self._std = 0.1  # standard deviation of feature computations
-        self.size = 2
+        self._size = 2
 
     def eps(self):
         return np.random.randn(2) * self._std
