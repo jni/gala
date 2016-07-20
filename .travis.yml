@@ -25,6 +25,7 @@ install:
   # install testing and coverage packages
   - pip install pytest pytest-cov
   - pip install coveralls
+  - pip install codacy-coverage
 
   # Install gala
   - printenv PWD
@@ -37,6 +38,9 @@ script:
 
 after_success:
   - if [[ $TRAVIS_PYTHON_VERSION == 3.5 ]]; then coveralls; fi
+  - coverage xml
+  - export CODACY_PROJECT_TOKEN=0610dea02dc34a2b941373e0d01f62dc
+  - python-codacy-coverage -r coverage.xml
 
 cache:
     directories:
