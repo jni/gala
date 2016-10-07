@@ -117,7 +117,7 @@ def flood_fill(im, start, acceptable, limits=None, raveled=False):
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef inline int _row_match(long[:, :] rows, long[:] query, long limit):
+cdef inline int _row_match(int[:, :] rows, int[:] query, int limit):
     """ Fast check if the `query` array is a row in `rows`
     
     Parameters
@@ -145,7 +145,10 @@ cdef inline int _row_match(long[:, :] rows, long[:] query, long limit):
             return rr
     return -1
 
-cdef inline _list_match(long[:] vals, long query):
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef inline int _list_match(int[:] vals, int query):
     """ Fast check if a long is in a list of longs
     
     Parameters
@@ -163,30 +166,40 @@ cdef inline _list_match(long[:] vals, long query):
     """
     cdef int jj
     for jj in range(vals.shape[0]):
-        if vals[jj] == query: return jj
+        if vals[jj] == query:
+            return jj
     return -1
 
-cdef _flood_fill_3d(long[:,:,:] im, long[:] start, long[:] acceptable, long[:,:] limits):
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef _flood_fill_3d(int[:, :, :] im, int[:] start, int[:] acceptable,
+                    int[:, :] limits):
     """ Workhorse function for flood_fill, see its documentation.
     Assumes im[start] is in acceptable and start is within limits. """
     cdef int frontier_size = 1
     cdef int matches_size = 1
     cdef int starting_size = 5000
     cdef int ndim = im.ndim
-    cdef int in_matches, in_acceptable, base_point_ii, p_ii, new_frontier_size, jj
-    cdef np.ndarray[np.int_t, ndim=2] adjacent
-    cdef np.ndarray[np.int_t, ndim=2] matches =      np.zeros([starting_size, ndim], dtype=np.int)
-    cdef np.ndarray[np.int_t, ndim=2] frontier =     np.empty([starting_size, ndim], dtype=np.int)
-    cdef np.ndarray[np.int_t, ndim=2] new_frontier = np.empty([starting_size, ndim], dtype=np.int)
-    cdef np.ndarray[np.int_t, ndim=1] base_point, p
+    cdef int in_matches, in_acceptable, base_point_ii, p_ii,\
+             new_frontier_size, jj
+    cdef Py_ssize_t idx
+    cdef int[:, ::1] adjacent
+    cdef int[:, ::1] matches = np.zeros([starting_size, ndim], dtype=np.int)
+    cdef int[:, ::1] frontier = np.empty([starting_size, ndim], dtype=np.int)
+    cdef int[:, ::1] new_frontier = \
+                                np.empty([starting_size, ndim], dtype=np.int)
+    cdef int[::1] base_point = np.empty(ndim, dtype=np.int)
+    cdef int[::1] p = np.empty(ndim, dtype=np.int)
 
     for jj in range(ndim):
-        frontier[0,jj] = start[jj]
-        matches[0,jj] = start[jj]
+        frontier[0, jj] = start[jj]
+        matches[0, jj] = start[jj]
     while frontier_size > 0:
         new_frontier_size = 0
         for base_point_ii in range(frontier_size):
-            base_point = frontier[base_point_ii]
+            for idx in range(ndim):
+                base_point[idx] = frontier[base_point_ii, idx]
             adjacent = _adjacent_points(base_point, limits)
             for p_ii in range(adjacent.shape[0]):
                 p = adjacent[p_ii]
@@ -212,7 +225,7 @@ cdef _flood_fill_3d(long[:,:,:] im, long[:] start, long[:] acceptable, long[:,:]
     return matches[0:matches_size, :]
 
  
-cdef np.ndarray[np.int_t, ndim=2] _expand_2darray(long[:,:] a):
+cdef np.ndarray[np.int_t, ndim=2] _expand_2darray(int[:,:] a):
     """ Double the number of rows in a matrix and copy over the existing values
     """
     cdef int ii,jj
@@ -223,7 +236,7 @@ cdef np.ndarray[np.int_t, ndim=2] _expand_2darray(long[:,:] a):
     return expanded
 
 
-cdef np.ndarray[np.int_t, ndim=2] _adjacent_points(long[:] point, long[:,:] limits):
+cdef np.ndarray[np.int_t, ndim=2] _adjacent_points(int[:] point, int[:,:] limits):
     """ Get all adjacent points to point that fall within limits. 
         
     Parameters
