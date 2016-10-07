@@ -1,5 +1,6 @@
 import numpy as np
 cimport numpy as np
+import cython
 
 def despeckle_watershed(ws, in_place=True):
     """ Function to clean up dots in an initial oversegmentation. 
@@ -62,6 +63,7 @@ cdef _despeckle_2d_watershed(long[:,:] ws):
             ws[ii,jj] = replacements[ws[ii,jj]]
     return ws
 
+
 def flood_fill(im, start, acceptable, limits=None, raveled=False):
     """ Find all connected points in a 3D volume.
 
@@ -98,8 +100,9 @@ def flood_fill(im, start, acceptable, limits=None, raveled=False):
     if im.ndim == 3:
         a = np.array(acceptable)
         s = np.array(start)
-        if limits == None:
-            limits = np.array([[0,im.shape[0]-1],[0,im.shape[1]-1],[0,im.shape[2]-1]])
+        if limits is None:
+            limits = np.column_stack((np.zeros(3, dtype=int),
+                                      np.array(im.shape) - 1))
         matches = _flood_fill_3d(im, s, a, limits)
         if _list_match(a, im[s[0], s[1], s[2]]) == -1:
             return np.array([])
@@ -108,9 +111,13 @@ def flood_fill(im, start, acceptable, limits=None, raveled=False):
             return np.ravel_multi_index(formatted, im.shape)
         else:
             return matches
-    else: raise ValueError("flood fill volume must be 3d!")
+    else:
+        raise ValueError("flood fill volume must be 3d!")
 
-cdef inline _row_match(long[:,:] rows, long[:] query, long limit):
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef inline int _row_match(long[:, :] rows, long[:] query, long limit):
     """ Fast check if the `query` array is a row in `rows`
     
     Parameters
@@ -131,10 +138,11 @@ cdef inline _row_match(long[:,:] rows, long[:] query, long limit):
     for rr in range(limit):
         match = 1
         for jj in range(rows.shape[1]):
-            if query[jj] != rows[rr,jj]:
+            if query[jj] != rows[rr, jj]:
                 match = 0
                 break
-        if match == 1: return rr
+        if match == 1:
+            return rr
     return -1
 
 cdef inline _list_match(long[:] vals, long query):
