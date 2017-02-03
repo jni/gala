@@ -3,6 +3,7 @@ from scipy import sparse
 
 class SparseLOL:
     def __init__(self, csr):
+        self.csr = csr
         self.indptr = csr.indptr
         self.indices = csr.indices
         self.data = csr.data

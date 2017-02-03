@@ -238,3 +238,24 @@ def best_segmentation(fragments: np.ndarray, ground_truth: np.ndarray,
     for i in range(len(indptr) - 1):
         rag.merge_subgraph(assignments.indices[indptr[i]:indptr[i+1]])
     return rag.current_segmentation()
+
+
+class SparseRAG:
+    def __init__(self, fragments, data):
+        em = edge_matrix(labels=fragments)
+        self.graph, self.boundaries = sparse_boundaries(em)
+        self.graph = self.graph + self.graph.T
+        self.nodes = sparselol.SparseLOL(sparselol.extents(fragments))
+        self.fragments = fragments.ravel()
+        self.data = data.ravel()
+        self.shape = data.shape
+
+    def mean_boundary_matrix(self):
+        g0 = self.graph.copy()
+        n_edges = self.boundaries.csr.nnz
+        self.boundaries.csr.data = np.broadcast_to(1, n_edges)
+        counts = np.ravel(self.boundaries.csr.sum(axis=1))
+        self.boundaries.csr.data = self.data
+        sums = np.ravel(self.boundaries.csr.sum(axis=1))
+        g0.data = sums
+        return g0
