@@ -244,7 +244,7 @@ class SparseRAG:
     def __init__(self, fragments, data):
         em = edge_matrix(labels=fragments)
         self.graph, self.boundaries = sparse_boundaries(em)
-        self.graph = self.graph + self.graph.T
+        self.graph_symmetric = self.graph + self.graph.T
         self.nodes = sparselol.SparseLOL(sparselol.extents(fragments))
         self.fragments = fragments.ravel()
         self.data = data.ravel()
@@ -253,9 +253,8 @@ class SparseRAG:
     def mean_boundary_matrix(self):
         g0 = self.graph.copy()
         n_edges = self.boundaries.csr.nnz
-        self.boundaries.csr.data = np.broadcast_to(1, n_edges)
-        counts = np.ravel(self.boundaries.csr.sum(axis=1))
-        self.boundaries.csr.data = self.data
-        sums = np.ravel(self.boundaries.csr.sum(axis=1))
-        g0.data = sums
+        counts = np.diff(self.boundaries.csr.indptr)
+        data = self.data[self.boundaries.csr.data]
+        sums = np.add.reduceat(data, self.boundaries.csr.indptr[:-1])
+        g0.data = sums[1:] / counts[1:]  # ignore 0 at idx 0
         return g0
