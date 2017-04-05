@@ -3,6 +3,7 @@ import collections
 import numpy as np
 from scipy import sparse, ndimage as ndi
 import networkx as nx
+import toolz as tz
 
 from viridis import tree
 
@@ -250,11 +251,11 @@ class SparseRAG:
         self.data = data.ravel()
         self.shape = data.shape
 
-    def mean_boundary_matrix(self):
-        g0 = self.graph.copy()
+    def boundary_mean_features(self, functions=[tz.identity]):
         n_edges = self.boundaries.csr.nnz
         counts = np.diff(self.boundaries.csr.indptr)
-        data = self.data[self.boundaries.csr.data]
+        pixels = self.data[self.boundaries.csr.data]
+        data = np.array([function(pixels) for function in functions]).T
         sums = np.add.reduceat(data, self.boundaries.csr.indptr[:-1])
-        g0.data = sums[1:] / counts[1:]  # ignore 0 at idx 0
-        return g0
+        sums[1:] /= counts[1:, np.newaxis]  # ignore 0 at idx 0
+        return np.column_stack((counts, sums))
