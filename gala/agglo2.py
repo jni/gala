@@ -251,11 +251,10 @@ class SparseRAG:
         self.data = data.ravel()
         self.shape = data.shape
 
-    def boundary_mean_features(self, functions=[tz.identity]):
+    def boundary_moments(self, functions=[tz.identity]):
         n_edges = self.boundaries.csr.nnz
         counts = np.diff(self.boundaries.csr.indptr)
         pixels = self.data[self.boundaries.csr.data]
         data = np.array([function(pixels) for function in functions]).T
         sums = np.add.reduceat(data, self.boundaries.csr.indptr[:-1])
-        sums[1:] /= counts[1:, np.newaxis]  # ignore 0 at idx 0
         return np.column_stack((counts, sums))
