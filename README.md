@@ -152,7 +152,7 @@ Below, we use a simple wrapper around the scikit-learn
 `RandomForestClassifier`.
 
 ```python
-rf = classify.DefaultRandomForest().fit(X, y)
+rf = classify.default_random_forest().fit(X, y)
 ```
 
 The composition of a feature map and a classifier defines a *policy* or
@@ -196,7 +196,7 @@ p4_train = imio.read_h5_stack('train-p4.lzf.h5')
 g_train4 = agglo.Rag(ws_train, p4_train, feature_manager=fc)
 (X4, y4, w4, merges4) = g_train4.learn_agglomerate(gt_train, fc)[0]
 y4 = y4[:, 0]
-rf4 = classify.DefaultRandomForest().fit(X4, y4)
+rf4 = classify.default_random_forest().fit(X4, y4)
 learned_policy4 = agglo.classifier_probability(fc, rf4)
 p4_test = imio.read_h5_stack('test-p4.lzf.h5')
 g_test4 = agglo.Rag(ws_test, p4_test, learned_policy4, feature_manager=fc)

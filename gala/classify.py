@@ -172,7 +172,7 @@ def get_classifier(name='random forest', *args, **kwargs):
             del kwargs['random_state']
         return VigraRandomForest(*args, **kwargs)
     elif is_random_forest:
-        return DefaultRandomForest(*args, **kwargs)
+        return default_random_forest(*args, **kwargs)
     elif is_naive_bayes:
         from sklearn.naive_bayes import GaussianNB
         if 'random_state' in kwargs:
@@ -185,13 +185,18 @@ def get_classifier(name='random forest', *args, **kwargs):
         raise NotImplementedError('Classifier "%s" is either not installed '
                                   'or not implemented in Gala.')
 
-class DefaultRandomForest(RandomForestClassifier):
-    def __init__(self, n_estimators=100, criterion='entropy', max_depth=20,
-            bootstrap=False, random_state=None, n_jobs=-1):
-        super(DefaultRandomForest, self).__init__(
-            n_estimators=n_estimators, criterion=criterion,
-            max_depth=max_depth, bootstrap=bootstrap,
-            random_state=random_state, n_jobs=n_jobs)
+
+def default_random_forest(*args, **kwargs):
+    n_estimators = kwargs.get('n_estimators', 100)
+    criterion = kwargs.get('criterion', 'entropy')
+    max_depth = kwargs.get('max_depth', 20)
+    bootstrap = kwargs.get('bootstrap', False)
+    random_state = kwargs.get('random_state', None)
+    n_jobs = kwargs.get('n_jobs', -1)
+    return RandomForestClassifier(n_estimators=n_estimators,
+                                  criterion=criterion, max_depth=max_depth,
+                                  bootstrap=bootstrap,
+                                  random_state=random_state, n_jobs=n_jobs)
 
 
 class VigraRandomForest(object):

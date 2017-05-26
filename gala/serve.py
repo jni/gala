@@ -258,7 +258,7 @@ class Solver:
         This resets the state of the RAG to contain only the merges and
         separations received over the course of its history.
         """
-        clf = classify.DefaultRandomForest().fit(self.features, self.targets)
+        clf = classify.default_random_forest().fit(self.features, self.targets)
         self.policy = agglo.classifier_probability(self.feature_manager, clf)
         self.rag = self.original_rag.copy()
         self.rag.merge_priority_function = self.policy

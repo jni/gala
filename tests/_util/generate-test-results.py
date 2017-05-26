@@ -13,7 +13,7 @@ np.random.RandomState(0)
 print X.shape
 np.savez('example-data/train-set.npz', X=X, y=y)
 y = y[:, 0]
-rf = classify.DefaultRandomForest()
+rf = classify.default_random_forest()
 X.shape
 np.random.RandomState(0)
 rf = rf.fit(X, y)
@@ -30,7 +30,7 @@ np.random.RandomState(0)
 print X4.shape
 np.savez('example-data/train-set4.npz', X=X4, y=y4)
 y4 = y4[:, 0]
-rf4 = classify.DefaultRandomForest()
+rf4 = classify.default_random_forest()
 np.random.RandomState(0)
 rf4 = rf4.fit(X4, y4)
 classify.save_classifier(rf4, 'example-data/rf-4.joblib')
