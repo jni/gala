@@ -65,13 +65,13 @@ def trexamples():
 
 def classifier():
     X, y = trexamples()
-    rf = classify.DefaultRandomForest()
+    rf = classify.get_classifier('logistic')
     rf.fit(X, y)
     return rf
 
 
 def policy():
-    rf = classify.DefaultRandomForest()
+    rf = classify.get_classifier('logistic')
     cl = agglo.classifier_probability(em, rf)
     return cl
 
@@ -100,12 +100,13 @@ def bench_suite():
     times['learn flat'] = t_flat[0]
     with timer() as t_gala:
         (X, y, w, e), allepochs = g.learn_agglomerate(gttr, em,
-                                                      min_num_epochs=5)
+                                                      min_num_epochs=5,
+                                                      classifier='logis')
         y = y[:, 0]  # ignore rand-sign and vi-sign schemes
     memory['training data'] = asizeof((X, y, w, e))
     times['learn agglo'] = t_gala[0]
     with timer() as t_train_classifier:
-        cl = classify.DefaultRandomForest()
+        cl = classify.get_classifier('logist')
         cl.fit(X, y)
     times['classifier training'] = t_train_classifier[0]
     memory['classifier training'] = asizeof(cl)
