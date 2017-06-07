@@ -252,9 +252,27 @@ class SparseRAG:
         self.shape = data.shape
 
     def boundary_moments(self, functions=[tz.identity]):
-        n_edges = self.boundaries.csr.nnz
-        counts = np.diff(self.boundaries.csr.indptr)
-        pixels = self.data[self.boundaries.csr.data]
+        return self.moments(self.boundary.indptr, self.boundary.indices,
+                            functions)
+
+    def node_moments(self, functions=[tz.identity]):
+        return self.moments(self.nodes.indptr, self.nodes.indices,
+                            functions)
+
+    def moments(self, indptr, indices, functions=[tz.identity]):
+        counts = np.diff(indptr)
+        pixels = self.data[indices]
         data = np.array([function(pixels) for function in functions]).T
-        sums = np.add.reduceat(data, self.boundaries.csr.indptr[:-1])
+        sums = np.add.reduceat(data, indptr[:-1])
         return np.column_stack((counts, sums))
+
+    def compute_feature_caches(self, functions=[tz.identity]):
+        self._cache_nodes = self.node_moments(functions)
+        self._cache_boundaries = self.boundary_moments(functions)
+
+    def compute_features(self, i, j):
+        pass
+
+    # Note can use the data field for actual data since it is redundant with
+    # the .indices field. OR make your own jitclass.
+    
