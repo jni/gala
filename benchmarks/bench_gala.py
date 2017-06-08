@@ -26,7 +26,7 @@ def timer():
     time.append(t1 - t0)
 
 
-em = features.default.paper_em()
+mh = features.default.moments_hist()
 
 
 def trdata():
@@ -51,14 +51,14 @@ def trgraph():
 
 def tsgraph():
     ws, pr, ts = tsdata()
-    g = agglo.Rag(ws, pr, feature_manager=em)
+    g = agglo.Rag(ws, pr, feature_manager=mh)
     return g
 
 
 def trexamples():
     gt = imio.read_h5_stack(os.path.join(dd, 'train-gt.lzf.h5'))
     g = trgraph()
-    (X, y, w, e), _ = g.learn_agglomerate(gt, em, min_num_epochs=5)
+    (X, y, w, e), _ = g.learn_agglomerate(gt, mh, min_num_epochs=5)
     y = y[:, 0]
     return X, y
 
@@ -72,7 +72,7 @@ def classifier():
 
 def policy():
     rf = classify.get_classifier('logistic')
-    cl = agglo.classifier_probability(em, rf)
+    cl = agglo.classifier_probability(mh, rf)
     return cl
 
 
@@ -92,14 +92,14 @@ def bench_suite():
     times['build RAG'] = t_build_rag[0]
     memory['base RAG'] = asizeof(g)
     with timer() as t_features:
-        g.set_feature_manager(em)
+        g.set_feature_manager(mh)
     times['build feature caches'] = t_features[0]
     memory['feature caches'] = asizeof(g) - memory['base RAG']
     with timer() as t_flat:
-        _ignore = g.learn_flat(gttr, em)
+        _ignore = g.learn_flat(gttr, mh)
     times['learn flat'] = t_flat[0]
     with timer() as t_gala:
-        (X, y, w, e), allepochs = g.learn_agglomerate(gttr, em,
+        (X, y, w, e), allepochs = g.learn_agglomerate(gttr, mh,
                                                       min_num_epochs=5,
                                                       classifier='logis')
         y = y[:, 0]  # ignore rand-sign and vi-sign schemes
@@ -110,10 +110,10 @@ def bench_suite():
         cl.fit(X, y)
     times['classifier training'] = t_train_classifier[0]
     memory['classifier training'] = asizeof(cl)
-    policy = agglo.classifier_probability(em, cl)
+    policy = agglo.classifier_probability(mh, cl)
     wsts, prts, gtts = tsdata()
     gtest = agglo.Rag(wsts, prts, merge_priority_function=policy,
-                      feature_manager=em)
+                      feature_manager=mh)
     with timer() as t_segment:
         gtest.agglomerate(np.inf)
     times['segment test volume'] = t_segment[0]
