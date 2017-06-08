@@ -11,7 +11,11 @@ import h5py
 import numpy as np
 np.seterr(divide='ignore')
 
+from sklearn.preprocessing import StandardScaler
+from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import make_pipeline
 from sklearn.externals import joblib
 
 try:
@@ -174,13 +178,12 @@ def get_classifier(name='random forest', *args, **kwargs):
     elif is_random_forest:
         return default_random_forest(*args, **kwargs)
     elif is_naive_bayes:
-        from sklearn.naive_bayes import GaussianNB
         if 'random_state' in kwargs:
             del kwargs['random_state']
         return GaussianNB(*args, **kwargs)
     elif is_logistic:
-        from sklearn.linear_model import LogisticRegression
-        return LogisticRegression(*args, **kwargs)
+        logit = LogisticRegression(*args, **kwargs)
+        return make_pipeline(StandardScaler(), logit)
     else:
         raise NotImplementedError('Classifier "%s" is either not installed '
                                   'or not implemented in Gala.')
