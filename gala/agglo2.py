@@ -10,6 +10,8 @@ from viridis import tree
 from . import evaluate as ev
 from . import sparselol
 
+from .features import moments
+
 
 def edge_matrix(labels, connectivity=1):
     """Generate a COO matrix containing the coordinates of edge pixels.
@@ -270,7 +272,10 @@ class SparseRAG:
         self._cache_boundaries = self.boundary_moments()
 
     def compute_features(self, i, j):
-        pass
+        arrs = list(map(moments.central_moments_from_noncentral_sums_py,
+                        [self._cache_nodes[i], self._cache_nodes[j],
+                         self._cache_boundaries[self.graph[i, j]]]))
+        return np.concatenate(arrs)
 
     # Note can use the data field for actual data since it is redundant with
     # the .indices field. OR make your own jitclass.
