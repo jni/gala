@@ -242,7 +242,7 @@ def best_segmentation(fragments: np.ndarray, ground_truth: np.ndarray,
 
 
 class SparseRAG:
-    def __init__(self, fragments, data):
+    def __init__(self, fragments, data, functions=[tz.identity]):
         em = edge_matrix(labels=fragments)
         self.graph, self.boundaries = sparse_boundaries(em)
         self.graph_symmetric = self.graph + self.graph.T
@@ -250,25 +250,24 @@ class SparseRAG:
         self.fragments = fragments.ravel()
         self.data = data.ravel()
         self.shape = data.shape
+        self.functions = functions
 
-    def boundary_moments(self, functions=[tz.identity]):
-        return self.moments(self.boundary.indptr, self.boundary.indices,
-                            functions)
+    def boundary_moments(self):
+        return self.moments(self.boundary.indptr, self.boundary.indices)
 
-    def node_moments(self, functions=[tz.identity]):
-        return self.moments(self.nodes.indptr, self.nodes.indices,
-                            functions)
+    def node_moments(self):
+        return self.moments(self.nodes.indptr, self.nodes.indices)
 
-    def moments(self, indptr, indices, functions=[tz.identity]):
+    def moments(self, indptr, indices):
         counts = np.diff(indptr)
         pixels = self.data[indices]
-        data = np.array([function(pixels) for function in functions]).T
+        data = np.array([function(pixels) for function in self.functions]).T
         sums = np.add.reduceat(data, indptr[:-1])
         return np.column_stack((counts, sums))
 
-    def compute_feature_caches(self, functions=[tz.identity]):
-        self._cache_nodes = self.node_moments(functions)
-        self._cache_boundaries = self.boundary_moments(functions)
+    def compute_feature_caches(self):
+        self._cache_nodes = self.node_moments()
+        self._cache_boundaries = self.boundary_moments()
 
     def compute_features(self, i, j):
         pass
