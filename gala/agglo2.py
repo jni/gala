@@ -253,7 +253,7 @@ class SparseRAG:
         self.functions = functions
 
     def boundary_moments(self):
-        return self.moments(self.boundary.indptr, self.boundary.indices)
+        return self.moments(self.boundaries.indptr, self.boundaries.indices)
 
     def node_moments(self):
         return self.moments(self.nodes.indptr, self.nodes.indices)
