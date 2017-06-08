@@ -61,7 +61,7 @@ cdef _despeckle_2d_watershed(long[:,:] ws):
     for ii in range(ws.shape[0]):
         for jj in range(ws.shape[1]):
             ws[ii,jj] = replacements[ws[ii,jj]]
-    return ws
+    return np.asarray(ws)
 
 
 def flood_fill(im, start, acceptable, limits=None, raveled=False):
@@ -222,7 +222,7 @@ cdef _flood_fill_3d(long[:, :, :] im, long[:] start, long[:] acceptable,
             for jj in range(new_frontier.shape[1]):
                 frontier[p_ii,jj] = new_frontier[p_ii, jj]
         frontier_size = new_frontier_size
-    return matches[0:matches_size, :]
+    return np.asarray(matches[0:matches_size, :])
 
  
 cdef np.ndarray[np.int_t, ndim=2] _expand_2darray(long[:,:] a):
