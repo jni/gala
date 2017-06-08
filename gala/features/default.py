@@ -1,5 +1,19 @@
 from . import base, moments, histogram, graph, contact
 
+
+def moments_hist():
+    """Return a reduced variant of the feature manager used in PLoS ONE.
+
+    It turns out that the graph manager takes up ~80% of the feature
+    computation time, for a marginal increase in accuracy. This should
+    be useful in cases where a small drop in accuracy is worth a large
+    increase in learning speed.
+    """
+    fm = moments.Manager()
+    fh = histogram.Manager(25, 0, 1, [0.1, 0.5, 0.9])
+    return base.Composite(children=[fm, fh])
+
+
 def paper_em():
     """Return the feature manager used in the PLoS ONE paper.
 
