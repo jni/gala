@@ -200,6 +200,10 @@ class Solver:
                 what = data['what']
                 if what == 'fragment-segment-lut':
                     self.send_segmentation()
+            elif command == 'paint':
+                label = data['label']
+                linear_idxs = data['indices']
+                self.paint(indices, label)
             elif command == 'stop':
                 return
             else:
@@ -266,6 +270,13 @@ class Solver:
         for i, (s0, s1) in enumerate(self.separate):
             self.rag.node[s0]['exclusions'].add(i)
             self.rag.node[s1]['exclusions'].add(i)
+
+    def paint(self, indices, label):
+        self.labels.ravel()[indices] = label
+        self.original_rag = agglo.Rag(self.labels, self.image,
+                                      feature_manager=self.feature_manager,
+                                      normalize_probabilities=True)
+        self.relearn()
 
 
 def proofread(fragments, true_segmentation, host='tcp://localhost', port=5556,
