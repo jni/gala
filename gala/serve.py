@@ -352,6 +352,24 @@ def proofread(fragments, true_segmentation, host='tcp://localhost', port=5556,
     return src, dst
 
 
+def paint(reference_image, new_image, *,
+          host, port, stop_when_finished=False):
+    diff = np.where(new_image != reference_image)
+    labels = np.unique(new_image[diff])
+    comm = zmq.Context().socket(zmq.PAIR)
+    comm.connect(host + ':' + str(port))
+    for label in labels:
+        idxs = [int(i) for i in np.flatnonzero(new_image == label)]
+        message = {'type': 'paint',
+                   'data': {'label': int(label), 'indices': idxs}}
+        print('painter sending...')
+        comm.send_json(message)
+    if stop_when_finished:
+        stop_msg = {'type': 'stop', 'data': {}}
+        print('painter sends: ', stop_msg)
+        comm.send_json(stop_msg)
+
+
 def main():
     parser = argparse.ArgumentParser('gala-serve')
     parser.add_argument('-f', '--config-file', help='JSON configuration file')
