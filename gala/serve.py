@@ -276,7 +276,9 @@ class Solver:
         self.original_rag = agglo.Rag(self.labels, self.image,
                                       feature_manager=self.feature_manager,
                                       normalize_probabilities=True)
-        self.relearn()
+        self.rag = self.original_rag.copy()
+        if len(self.targets) > self.relearn_threshold:
+            self.relearn()
 
 
 def proofread(fragments, true_segmentation, host='tcp://localhost', port=5556,
