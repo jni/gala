@@ -203,7 +203,7 @@ class Solver:
             elif command == 'paint':
                 label = data['label']
                 linear_idxs = data['indices']
-                self.paint(indices, label)
+                self.paint(linear_idxs, label)
             elif command == 'stop':
                 return
             else:
