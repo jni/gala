@@ -145,6 +145,41 @@ def test_server_with_periodic_send(dummy_data):
     # test 2: make sure ID service worked: starting ID should be as above
     # should be equal but boundary ID messes things up
     assert np.min(result) > starting_id
+    thread.join()
+
+
+def test_paint(dummy_data):
+    frag, gt, fman = dummy_data
+    id_service_port = 5602
+    config = {'client_url': 'tcp://*:5592',
+              'id_service_url': 'tcp://localhost:%i' % id_service_port,
+              'solver_url': 'tcp://localhost:5592'}
+    with temporary_file('.json') as config_filename:
+        with open(config_filename, 'w') as fout:
+            json.dump(config, fout)
+        solver = serve.Solver(frag, feature_manager=fman,
+                              config_file=config_filename)
+    starting_id = 23461
+    id_thread = threading.Thread(target=id_serve, name='id-service',
+                                 daemon=True,
+                                 kwargs=dict(port=id_service_port,
+                                             curr_id=starting_id))
+    id_thread.start()
+    thread = threading.Thread(target=solver.listen, name='solver', daemon=True,
+                              kwargs=dict(send_every=10))
+    thread.start()
+    new_frag = np.array(frag, copy=True)
+    #comm = zmq.Context().socket(zmq.REQ)
+    #comm.connect(config['id_service_url'])
+    #comm.send_json({'count': 1})
+    #new_id = comm.recv_json()['begin']
+    new_id = 17
+    new_frag[0:3, 5:11] = new_id
+    host, port = config['solver_url'].rsplit(':', maxsplit=1)
+    serve.paint(frag, new_frag, host=host, port=int(port),
+                stop_when_finished=True)
+    assert new_id in solver.rag
+    thread.join()
 
 
 @pytest.fixture
