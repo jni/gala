@@ -2,6 +2,18 @@
 Release notes
 =============
 
+0.5-dev
+=======
+
+(These changes are not yet available on a released version, but can be obtained
+by installing from the master branch at https://github.com/janelia-flyem/gala.)
+
+- Fix VTK file IO, which was broken in the Python 3 migration `(#88 <https://github.com/janelia-flyem/gala/pull/88>)`__.
+- Fix adjusted Rand index calculation (`#89 <https://github.com/janelia-flyem/gala/pull/89>`__ by `@JohnnyTeutonic <https://github.com/JohnnyTeutonic>`__
+- Various documentation fixes
+- The gala interactive server can now be called from the command line; after
+  installation, type `gala-serve -h` for more information.
+
 0.4
 ===
 
